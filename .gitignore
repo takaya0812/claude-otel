@@ -1,0 +1,17 @@
+# Runtime data
+data/
+*.db
+*.jsonl
+*.offset
+
+# MCP browser session logs
+.playwright-mcp/
+
+# macOS
+.DS_Store
+
+# Claude Code local settings (may contain personal config)
+.claude/settings.local.json
+
+# Backup files
+*.bak

@@ -1,0 +1,38 @@
+receivers:
+  otlp:
+    protocols:
+      http:
+        endpoint: 0.0.0.0:4318
+
+processors:
+  batch:
+    timeout: 2s
+    send_batch_size: 256
+
+exporters:
+  file:
+    path: /data/otel-logs.jsonl
+    rotation:
+      max_megabytes: 100
+      max_days: 0
+      max_backups: 10
+  debug:
+    verbosity: basic
+
+service:
+  pipelines:
+    logs:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [file, debug]
+    metrics:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [file, debug]
+    traces:
+      receivers: [otlp]
+      processors: [batch]
+      exporters: [file, debug]
+  telemetry:
+    logs:
+      level: warn

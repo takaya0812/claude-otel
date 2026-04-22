@@ -1,0 +1,210 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<mxfile host="app.diagrams.net" modified="2026-04-22T00:00:00.000Z" agent="Claude" version="21.6.5">
+  <diagram id="claude-otel-arch" name="claude-otel アーキテクチャ">
+    <mxGraphModel dx="1800" dy="1100" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1800" pageHeight="1150" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- ========================================================== -->
+        <!-- タイトル                                                    -->
+        <!-- ========================================================== -->
+        <mxCell id="title" value="claude-otel アーキテクチャ" style="text;html=1;strokeColor=none;fillColor=none;align=center;verticalAlign=middle;fontSize=22;fontStyle=1;fontColor=#333333;" vertex="1" parent="1">
+          <mxGeometry x="600" y="10" width="600" height="40" as="geometry" />
+        </mxCell>
+
+        <!-- ========================================================== -->
+        <!-- 背景: macOS Host                                            -->
+        <!-- ========================================================== -->
+        <mxCell id="bg_macos" value="macOS Host" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fafafa;strokeColor=#999999;fontColor=#555555;fontSize=14;fontStyle=1;verticalAlign=top;arcSize=2;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="20" y="60" width="1760" height="1070" as="geometry" />
+        </mxCell>
+
+        <!-- ========================================================== -->
+        <!-- 背景: Docker Compose                                        -->
+        <!-- ========================================================== -->
+        <mxCell id="bg_docker" value="Docker Compose（docker-compose.yml）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#eaf2fb;strokeColor=#6c8ebf;fontSize=13;fontStyle=1;fontColor=#2d5a8e;verticalAlign=top;dashed=1;dashPattern=10 5;arcSize=2;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="60" y="260" width="1680" height="320" as="geometry" />
+        </mxCell>
+
+        <!-- ========================================================== -->
+        <!-- 背景: data/ 共有ボリューム                                  -->
+        <!-- ========================================================== -->
+        <mxCell id="bg_data" value="data/　（ホスト ↔ Docker コンテナ間の共有ボリューム）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff8e1;strokeColor=#d6b656;fontSize=13;fontStyle=1;fontColor=#8a6d00;verticalAlign=top;arcSize=3;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="200" y="660" width="1400" height="180" as="geometry" />
+        </mxCell>
+
+        <!-- ========================================================== -->
+        <!-- 登場人物（クライアント層）                                  -->
+        <!-- ========================================================== -->
+
+        <!-- Claude Code CLI -->
+        <mxCell id="claude" value="&lt;b style=&quot;font-size:14px;&quot;&gt;Claude Code CLI&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#555;&quot;&gt;Anthropic 公式 CLI&lt;/font&gt;&lt;hr size=&quot;1&quot; style=&quot;margin:4px 0;&quot;&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;環境変数:&lt;/b&gt;&lt;br&gt;CLAUDE_CODE_ENABLE_TELEMETRY=1&lt;br&gt;OTEL_EXPORTER_OTLP_ENDPOINT=...:4318&lt;br&gt;OTEL_EXPORTER_OTLP_PROTOCOL=http/protobuf&lt;br&gt;OTEL_RESOURCE_ATTRIBUTES=user.email=...&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#4caf50;fontSize=11;align=left;spacingLeft=10;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="560" y="100" width="380" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- Browser -->
+        <mxCell id="browser" value="&lt;b style=&quot;font-size:14px;&quot;&gt;ブラウザ&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#555;&quot;&gt;閲覧クライアント&lt;/font&gt;&lt;hr size=&quot;1&quot; style=&quot;margin:4px 0;&quot;&gt;&lt;font style=&quot;font-size:11px;&quot;&gt;http://localhost:3000&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffebee;strokeColor=#e57373;fontSize=11;align=center;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="1440" y="100" width="240" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- ========================================================== -->
+        <!-- Docker コンテナ                                              -->
+        <!-- ========================================================== -->
+
+        <!-- OTel Collector -->
+        <mxCell id="collector" value="&lt;b style=&quot;font-size:14px;&quot;&gt;OTel Collector&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#555;&quot;&gt;otel/opentelemetry-collector-contrib&lt;br&gt;container: claude-otel-collector&lt;/font&gt;&lt;hr size=&quot;1&quot; style=&quot;margin:4px 0;&quot;&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;pipeline:&lt;/b&gt;&lt;br&gt;　receiver　: otlp HTTP &lt;b&gt;:4318&lt;/b&gt;&lt;br&gt;　processor : batch（5 s / 256 件）&lt;br&gt;　exporter　: file + debug stdout&lt;br&gt;&lt;br&gt;&lt;b&gt;ローテーション:&lt;/b&gt; 100 MB × 10 世代&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontSize=11;align=left;spacingLeft=10;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="120" y="310" width="340" height="240" as="geometry" />
+        </mxCell>
+
+        <!-- Grafana -->
+        <mxCell id="grafana" value="&lt;b style=&quot;font-size:14px;&quot;&gt;Grafana&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#555;&quot;&gt;grafana/grafana&lt;br&gt;container: claude-otel-grafana&lt;/font&gt;&lt;hr size=&quot;1&quot; style=&quot;margin:4px 0;&quot;&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;&lt;b&gt;構成:&lt;/b&gt;&lt;br&gt;　plugin 　: frser-sqlite-datasource&lt;br&gt;　dashboard: 履歴（30 日 / 30 s refresh）&lt;br&gt;　dashboard: リアルタイム（30 分 / 5 s）&lt;br&gt;&lt;br&gt;&lt;b&gt;port:&lt;/b&gt; &lt;b&gt;:3000&lt;/b&gt; ／ 認証なし（anonymous）&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontSize=11;align=left;spacingLeft=10;spacingTop=8;" vertex="1" parent="1">
+          <mxGeometry x="1340" y="310" width="360" height="240" as="geometry" />
+        </mxCell>
+
+        <!-- ========================================================== -->
+        <!-- data/ 内部のファイル                                         -->
+        <!-- ========================================================== -->
+
+        <!-- otel-logs.jsonl -->
+        <mxCell id="jsonl" value="&lt;b style=&quot;font-size:12px;&quot;&gt;otel-logs.jsonl&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#555;&quot;&gt;OTel 生データ（JSONL）&lt;br&gt;Collector が追記&lt;br&gt;ingest.py が読み取り&lt;/font&gt;" style="shape=note;size=16;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#fbc02d;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="250" y="700" width="260" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- claude_code.db -->
+        <mxCell id="db" value="&lt;b style=&quot;font-size:12px;&quot;&gt;claude_code.db&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#555;&quot;&gt;SQLite データベース&lt;br&gt;api_requests / session_events&lt;br&gt;raw_records / 2 views&lt;/font&gt;" style="shape=cylinder3;whiteSpace=wrap;html=1;boundedLbl=1;backgroundOutline=1;size=12;fillColor=#fffde7;strokeColor=#fbc02d;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="720" y="695" width="260" height="130" as="geometry" />
+        </mxCell>
+
+        <!-- claude_code.offset -->
+        <mxCell id="offset_f" value="&lt;b style=&quot;font-size:12px;&quot;&gt;claude_code.offset&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#555;&quot;&gt;読み取り済みバイト位置&lt;br&gt;差分取り込みに使用&lt;br&gt;（再起動後の再開点）&lt;/font&gt;" style="shape=note;size=16;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#fbc02d;fontSize=11;align=left;spacingLeft=8;" vertex="1" parent="1">
+          <mxGeometry x="1200" y="700" width="280" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- ========================================================== -->
+        <!-- ホストプロセス: ingest.py                                    -->
+        <!-- ========================================================== -->
+        <mxCell id="ingest" value="&lt;b style=&quot;font-size:14px;&quot;&gt;ingest.py --watch&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#555;&quot;&gt;ホスト Python プロセス（launchd 管理）&lt;/font&gt;&lt;hr size=&quot;1&quot; style=&quot;margin:4px 0;&quot;&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;5 秒ごとに JSONL をポーリング ／ オフセットで差分取得&lt;br&gt;OTel 属性をフラット辞書に正規化 → api_requests / session_events に INSERT&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#8e24aa;fontSize=11;align=center;" vertex="1" parent="1">
+          <mxGeometry x="500" y="900" width="800" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ========================================================== -->
+        <!-- 自動起動（macOS）                                            -->
+        <!-- ========================================================== -->
+
+        <!-- launchd -->
+        <mxCell id="launchd" value="&lt;b style=&quot;font-size:13px;&quot;&gt;launchd&lt;/b&gt;&lt;br&gt;&lt;font style=&quot;font-size:10px;color:#555;&quot;&gt;com.claude.otel-monitor.plist&lt;br&gt;ログイン時起動 / KeepAlive&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#4caf50;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="80" y="915" width="220" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- start-monitoring.sh -->
+        <mxCell id="script" value="&lt;b style=&quot;font-size:13px;&quot;&gt;start-monitoring.sh&lt;/b&gt;&lt;hr size=&quot;1&quot; style=&quot;margin:4px 0;&quot;&gt;&lt;font style=&quot;font-size:10px;&quot;&gt;① Docker daemon 待機（最大 60 s）&lt;br&gt;② docker compose up -d&lt;br&gt;③ pkill ingest.py（重複防止）&lt;br&gt;④ exec python3 ingest.py --watch&lt;/font&gt;" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#4caf50;fontSize=11;align=left;spacingLeft=10;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="80" y="1030" width="320" height="90" as="geometry" />
+        </mxCell>
+
+        <!-- ========================================================== -->
+        <!-- 矢印（データフロー）                                         -->
+        <!-- ========================================================== -->
+
+        <!-- 1. Claude Code → OTel Collector -->
+        <mxCell id="arr1" value="&lt;b&gt;① OTLP/HTTP&lt;/b&gt;&lt;br&gt;POST /v1/logs&lt;br&gt;:4318" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.2;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#4caf50;strokeWidth=2.5;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" source="claude" target="collector" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 2. OTel Collector → otel-logs.jsonl -->
+        <mxCell id="arr2" value="&lt;b&gt;② file write&lt;/b&gt;&lt;br&gt;（batch 5 s / 256 件）" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.5;entryY=0;entryDx=0;entryDy=0;strokeColor=#1976d2;strokeWidth=2.5;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" source="collector" target="jsonl" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 3. ingest.py → otel-logs.jsonl -->
+        <mxCell id="arr3" value="&lt;b&gt;③ read&lt;/b&gt;&lt;br&gt;5 s poll&lt;br&gt;(offset追跡)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.15;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeColor=#8e24aa;strokeWidth=2.5;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" source="ingest" target="jsonl" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 4. ingest.py → claude_code.db -->
+        <mxCell id="arr4" value="&lt;b&gt;④ SQLite&lt;/b&gt;&lt;br&gt;INSERT" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeColor=#8e24aa;strokeWidth=2.5;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" source="ingest" target="db" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 5. ingest.py → claude_code.offset -->
+        <mxCell id="arr5" value="&lt;b&gt;⑤ offset 更新&lt;/b&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.85;exitY=0;exitDx=0;exitDy=0;entryX=0.5;entryY=1;entryDx=0;entryDy=0;strokeColor=#8e24aa;strokeWidth=1.5;dashed=1;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" source="ingest" target="offset_f" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 6. Grafana → claude_code.db -->
+        <mxCell id="arr6" value="&lt;b&gt;⑥ SQL query&lt;/b&gt;&lt;br&gt;frser-sqlite&lt;br&gt;(5-30 s refresh)" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.8;entryY=0;entryDx=0;entryDy=0;strokeColor=#f57c00;strokeWidth=2.5;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" source="grafana" target="db" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 7. Browser → Grafana -->
+        <mxCell id="arr7" value="&lt;b&gt;⑦ HTTP :3000&lt;/b&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.8;entryY=0;entryDx=0;entryDy=0;strokeColor=#e57373;strokeWidth=2.5;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" source="browser" target="grafana" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 8. launchd → start-monitoring.sh -->
+        <mxCell id="arr8" value="KeepAlive" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=1;exitDx=0;exitDy=0;entryX=0.3;entryY=0;entryDx=0;entryDy=0;strokeColor=#4caf50;strokeWidth=2;fontSize=10;labelBackgroundColor=#ffffff;" edge="1" source="launchd" target="script" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 9. start-monitoring.sh → Docker Compose (docker compose up -d) -->
+        <mxCell id="arr9" value="&lt;b&gt;docker compose up -d&lt;/b&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=0.5;exitY=0;exitDx=0;exitDy=0;entryX=0.02;entryY=1;entryDx=0;entryDy=0;strokeColor=#4caf50;strokeWidth=2;dashed=1;fontSize=10;labelBackgroundColor=#ffffff;endArrow=open;" edge="1" source="script" target="bg_docker" parent="1">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="240" y="760" />
+              <mxPoint x="80" y="760" />
+              <mxPoint x="80" y="580" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+
+        <!-- 10. start-monitoring.sh → ingest.py (exec) -->
+        <mxCell id="arr10" value="&lt;b&gt;exec python3 --watch&lt;/b&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;exitX=1;exitY=0.5;exitDx=0;exitDy=0;entryX=0;entryY=0.5;entryDx=0;entryDy=0;strokeColor=#4caf50;strokeWidth=2;fontSize=10;labelBackgroundColor=#ffffff;endArrow=open;" edge="1" source="script" target="ingest" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- ========================================================== -->
+        <!-- 凡例                                                         -->
+        <!-- ========================================================== -->
+        <mxCell id="legend_box" value="凡例" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffffff;strokeColor=#999999;fontSize=12;fontStyle=1;verticalAlign=top;spacingTop=6;" vertex="1" parent="1">
+          <mxGeometry x="1470" y="900" width="290" height="200" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg_client" value="クライアント" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e8f5e9;strokeColor=#4caf50;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1485" y="930" width="110" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_client_t" value="Claude Code / 起動スクリプト" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1605" y="930" width="150" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg_docker" value="Docker" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e3f2fd;strokeColor=#1976d2;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1485" y="960" width="110" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_docker_t" value="Collector" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1605" y="960" width="150" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg_viz" value="可視化" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fff3e0;strokeColor=#f57c00;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1485" y="990" width="110" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_viz_t" value="Grafana / ブラウザ" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1605" y="990" width="150" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg_host" value="ホストプロセス" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f3e5f5;strokeColor=#8e24aa;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1485" y="1020" width="110" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_host_t" value="ingest.py" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1605" y="1020" width="150" height="24" as="geometry" />
+        </mxCell>
+
+        <mxCell id="leg_data" value="共有データ" style="shape=note;size=10;whiteSpace=wrap;html=1;fillColor=#fffde7;strokeColor=#fbc02d;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1485" y="1050" width="110" height="24" as="geometry" />
+        </mxCell>
+        <mxCell id="leg_data_t" value="data/ ボリューム内のファイル" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=10;" vertex="1" parent="1">
+          <mxGeometry x="1605" y="1050" width="165" height="24" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>

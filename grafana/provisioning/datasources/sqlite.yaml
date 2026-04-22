@@ -1,0 +1,9 @@
+apiVersion: 1
+
+datasources:
+  - name: Claude Code Telemetry
+    type: frser-sqlite-datasource
+    access: proxy
+    isDefault: true
+    jsonData:
+      path: /data/claude_code.db
