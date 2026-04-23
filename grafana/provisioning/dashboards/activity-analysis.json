@@ -35,13 +35,409 @@
   },
   "panels": [
     {
+      "id": 1,
+      "type": "stat",
+      "title": "ツール accept 率",
+      "gridPos": {
+        "x": 0,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 50
+              },
+              {
+                "color": "green",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT\n  ROUND(\n    100.0 * SUM(CASE WHEN json_extract(raw_json, '$.decision') = 'accept' THEN 1 ELSE 0 END)\n    / NULLIF(COUNT(*), 0),\n    1\n  ) AS value\nFROM session_events\nWHERE event_name = 'tool_decision'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "type": "stat",
+      "title": "ツール成功率",
+      "gridPos": {
+        "x": 4,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "green",
+                "value": 90
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT\n  ROUND(\n    100.0 * SUM(CASE WHEN json_extract(raw_json, '$.success') = 'true' THEN 1 ELSE 0 END)\n    / NULLIF(COUNT(*), 0),\n    1\n  ) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "type": "stat",
+      "title": "ツール実行数",
+      "gridPos": {
+        "x": 8,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "type": "stat",
+      "title": "平均ツール実行時間",
+      "gridPos": {
+        "x": 12,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1000
+              },
+              {
+                "color": "red",
+                "value": 5000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT\n  ROUND(AVG(CAST(json_extract(raw_json, '$.duration_ms') AS REAL)), 0) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND json_extract(raw_json, '$.duration_ms') IS NOT NULL\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "type": "stat",
+      "title": "最大ツール実行時間",
+      "gridPos": {
+        "x": 16,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT\n  MAX(CAST(json_extract(raw_json, '$.duration_ms') AS INTEGER)) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "type": "stat",
+      "title": "ツール失敗数",
+      "gridPos": {
+        "x": 20,
+        "y": 0,
+        "w": 4,
+        "h": 4
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND json_extract(raw_json, '$.success') = 'false'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "type": "barchart",
+      "title": "ツール別 accept/reject 件数",
+      "gridPos": {
+        "x": 0,
+        "y": 4,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "tool_name",
+        "stacking": "normal",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "accept"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "reject"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#F2495C",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT\n  json_extract(raw_json, '$.tool_name') AS tool_name,\n  SUM(CASE WHEN json_extract(raw_json, '$.decision') = 'accept' THEN 1 ELSE 0 END) AS accept,\n  SUM(CASE WHEN json_extract(raw_json, '$.decision') = 'reject' THEN 1 ELSE 0 END) AS reject\nFROM session_events\nWHERE event_name = 'tool_decision'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.tool_name')\nORDER BY (accept + reject) DESC\nLIMIT 15",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "type": "barchart",
+      "title": "ツール別 平均実行時間",
+      "gridPos": {
+        "x": 12,
+        "y": 4,
+        "w": 12,
+        "h": 9
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "tool_name",
+        "stacking": "normal",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT\n  json_extract(raw_json, '$.tool_name') AS tool_name,\n  ROUND(AVG(CAST(json_extract(raw_json, '$.duration_ms') AS REAL)), 0) AS avg_ms\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND json_extract(raw_json, '$.duration_ms') IS NOT NULL\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.tool_name')\nORDER BY avg_ms DESC\nLIMIT 15",
+          "format": "table"
+        }
+      ]
+    },
+    {
       "id": 9,
       "type": "stat",
       "title": "総プロンプト数",
-      "gridPos": { "x": 0, "y": 13, "w": 6, "h": 4 },
+      "gridPos": {
+        "x": 0,
+        "y": 13,
+        "w": 6,
+        "h": 4
+      },
       "datasource": "Claude Code Telemetry",
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "value",
         "graphMode": "none",
         "textMode": "auto"
@@ -51,7 +447,12 @@
           "unit": "locale",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "green", "value": null }]
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
         "overrides": []
@@ -67,10 +468,19 @@
       "id": 10,
       "type": "stat",
       "title": "平均プロンプト長",
-      "gridPos": { "x": 6, "y": 13, "w": 6, "h": 4 },
+      "gridPos": {
+        "x": 6,
+        "y": 13,
+        "w": 6,
+        "h": 4
+      },
       "datasource": "Claude Code Telemetry",
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "value",
         "graphMode": "none",
         "textMode": "auto"
@@ -80,7 +490,12 @@
           "unit": "locale",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "green", "value": null }]
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
         "overrides": []
@@ -96,11 +511,21 @@
       "id": 11,
       "type": "timeseries",
       "title": "日次プロンプト数推移",
-      "gridPos": { "x": 0, "y": 17, "w": 24, "h": 8 },
+      "gridPos": {
+        "x": 0,
+        "y": 17,
+        "w": 24,
+        "h": 8
+      },
       "datasource": "Claude Code Telemetry",
       "options": {
-        "tooltip": { "mode": "single" },
-        "legend": { "displayMode": "list", "placement": "bottom" }
+        "tooltip": {
+          "mode": "single"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
       },
       "fieldConfig": {
         "defaults": {
@@ -116,7 +541,9 @@
         {
           "rawSql": "SELECT\n  DATE(event_timestamp) || 'T00:00:00Z' AS time,\n  COUNT(*) AS prompt_count\nFROM session_events\nWHERE event_name = 'user_prompt'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY DATE(event_timestamp)\nORDER BY time ASC",
           "format": "time_series",
-          "timeColumns": ["time"]
+          "timeColumns": [
+            "time"
+          ]
         }
       ]
     },
@@ -124,10 +551,19 @@
       "id": 12,
       "type": "stat",
       "title": "API エラー数",
-      "gridPos": { "x": 0, "y": 25, "w": 6, "h": 4 },
+      "gridPos": {
+        "x": 0,
+        "y": 25,
+        "w": 6,
+        "h": 4
+      },
       "datasource": "Claude Code Telemetry",
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "background",
         "graphMode": "none",
         "textMode": "auto"
@@ -138,9 +574,18 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 1 },
-              { "color": "red", "value": 10 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
             ]
           }
         },
@@ -157,10 +602,19 @@
       "id": 13,
       "type": "stat",
       "title": "内部エラー数",
-      "gridPos": { "x": 6, "y": 25, "w": 6, "h": 4 },
+      "gridPos": {
+        "x": 6,
+        "y": 25,
+        "w": 6,
+        "h": 4
+      },
       "datasource": "Claude Code Telemetry",
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "background",
         "graphMode": "none",
         "textMode": "auto"
@@ -171,9 +625,18 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 1 },
-              { "color": "red", "value": 10 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 10
+              }
             ]
           }
         },
@@ -190,10 +653,19 @@
       "id": 14,
       "type": "stat",
       "title": "認証エラー数",
-      "gridPos": { "x": 12, "y": 25, "w": 6, "h": 4 },
+      "gridPos": {
+        "x": 12,
+        "y": 25,
+        "w": 6,
+        "h": 4
+      },
       "datasource": "Claude Code Telemetry",
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "background",
         "graphMode": "none",
         "textMode": "auto"
@@ -204,9 +676,18 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "green", "value": null },
-              { "color": "yellow", "value": 1 },
-              { "color": "red", "value": 5 }
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1
+              },
+              {
+                "color": "red",
+                "value": 5
+              }
             ]
           }
         },
@@ -223,14 +704,23 @@
       "id": 15,
       "type": "table",
       "title": "API エラー詳細一覧",
-      "gridPos": { "x": 0, "y": 29, "w": 24, "h": 9 },
+      "gridPos": {
+        "x": 0,
+        "y": 29,
+        "w": 24,
+        "h": 9
+      },
       "datasource": "Claude Code Telemetry",
       "options": {
         "showHeader": true,
-        "footer": { "show": false }
+        "footer": {
+          "show": false
+        }
       },
       "fieldConfig": {
-        "defaults": { "unit": "short" },
+        "defaults": {
+          "unit": "short"
+        },
         "overrides": []
       },
       "targets": [
@@ -244,10 +734,19 @@
       "id": 16,
       "type": "stat",
       "title": "MCP 接続数",
-      "gridPos": { "x": 0, "y": 38, "w": 6, "h": 4 },
+      "gridPos": {
+        "x": 0,
+        "y": 38,
+        "w": 6,
+        "h": 4
+      },
       "datasource": "Claude Code Telemetry",
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "value",
         "graphMode": "none",
         "textMode": "auto"
@@ -257,7 +756,12 @@
           "unit": "short",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "green", "value": null }]
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
         "overrides": []
@@ -273,10 +777,19 @@
       "id": 17,
       "type": "stat",
       "title": "スキル起動数",
-      "gridPos": { "x": 6, "y": 38, "w": 6, "h": 4 },
+      "gridPos": {
+        "x": 6,
+        "y": 38,
+        "w": 6,
+        "h": 4
+      },
       "datasource": "Claude Code Telemetry",
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "value",
         "graphMode": "none",
         "textMode": "auto"
@@ -286,7 +799,12 @@
           "unit": "short",
           "thresholds": {
             "mode": "absolute",
-            "steps": [{ "color": "green", "value": null }]
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              }
+            ]
           }
         },
         "overrides": []
@@ -302,10 +820,19 @@
       "id": 18,
       "type": "stat",
       "title": "フック成功率",
-      "gridPos": { "x": 12, "y": 38, "w": 6, "h": 4 },
+      "gridPos": {
+        "x": 12,
+        "y": 38,
+        "w": 6,
+        "h": 4
+      },
       "datasource": "Claude Code Telemetry",
       "options": {
-        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
         "colorMode": "background",
         "graphMode": "none",
         "textMode": "auto"
@@ -316,9 +843,18 @@
           "thresholds": {
             "mode": "absolute",
             "steps": [
-              { "color": "red", "value": null },
-              { "color": "yellow", "value": 70 },
-              { "color": "green", "value": 90 }
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 70
+              },
+              {
+                "color": "green",
+                "value": 90
+              }
             ]
           }
         },
@@ -335,24 +871,56 @@
       "id": 19,
       "type": "barchart",
       "title": "フックイベント別 成功/失敗件数",
-      "gridPos": { "x": 0, "y": 42, "w": 12, "h": 9 },
+      "gridPos": {
+        "x": 0,
+        "y": 42,
+        "w": 12,
+        "h": 9
+      },
       "datasource": "Claude Code Telemetry",
       "options": {
         "xField": "hook_event",
         "stacking": "normal",
         "orientation": "auto",
-        "legend": { "displayMode": "list", "placement": "bottom" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
       },
       "fieldConfig": {
-        "defaults": { "unit": "short" },
+        "defaults": {
+          "unit": "short"
+        },
         "overrides": [
           {
-            "matcher": { "id": "byName", "options": "success" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "#73BF69", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "success"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
           },
           {
-            "matcher": { "id": "byName", "options": "failure" },
-            "properties": [{ "id": "color", "value": { "fixedColor": "#F2495C", "mode": "fixed" } }]
+            "matcher": {
+              "id": "byName",
+              "options": "failure"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#F2495C",
+                  "mode": "fixed"
+                }
+              }
+            ]
           }
         ]
       },
@@ -367,16 +935,26 @@
       "id": 20,
       "type": "barchart",
       "title": "スキル別起動件数",
-      "gridPos": { "x": 12, "y": 42, "w": 12, "h": 9 },
+      "gridPos": {
+        "x": 12,
+        "y": 42,
+        "w": 12,
+        "h": 9
+      },
       "datasource": "Claude Code Telemetry",
       "options": {
         "xField": "skill_name",
         "stacking": "none",
         "orientation": "auto",
-        "legend": { "displayMode": "list", "placement": "bottom" }
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
       },
       "fieldConfig": {
-        "defaults": { "unit": "short" },
+        "defaults": {
+          "unit": "short"
+        },
         "overrides": []
       },
       "targets": [
