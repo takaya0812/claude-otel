@@ -80,7 +80,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT\n  ROUND(\n    100.0 * SUM(CASE WHEN json_extract(raw_json, '$.decision') = 'accept' THEN 1 ELSE 0 END)\n    / NULLIF(COUNT(*), 0),\n    1\n  ) AS value\nFROM session_events\nWHERE event_name = 'tool_decision'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT\n  ROUND(\n    100.0 * SUM(CASE WHEN json_extract(raw_json, '$.decision') = 'accept' THEN 1 ELSE 0 END)\n    / NULLIF(COUNT(*), 0),\n    1\n  ) AS value\nFROM session_events\nWHERE event_name = 'tool_decision'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -131,7 +131,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT\n  ROUND(\n    100.0 * SUM(CASE WHEN json_extract(raw_json, '$.success') = 'true' THEN 1 ELSE 0 END)\n    / NULLIF(COUNT(*), 0),\n    1\n  ) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT\n  ROUND(\n    100.0 * SUM(CASE WHEN json_extract(raw_json, '$.success') = 'true' THEN 1 ELSE 0 END)\n    / NULLIF(COUNT(*), 0),\n    1\n  ) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -174,7 +174,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -225,7 +225,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT\n  ROUND(AVG(CAST(json_extract(raw_json, '$.duration_ms') AS REAL)), 0) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND json_extract(raw_json, '$.duration_ms') IS NOT NULL\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT\n  ROUND(AVG(CAST(json_extract(raw_json, '$.duration_ms') AS REAL)), 0) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND json_extract(raw_json, '$.duration_ms') IS NOT NULL\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -268,7 +268,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT\n  MAX(CAST(json_extract(raw_json, '$.duration_ms') AS INTEGER)) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT\n  MAX(CAST(json_extract(raw_json, '$.duration_ms') AS INTEGER)) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -319,7 +319,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND json_extract(raw_json, '$.success') = 'false'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND json_extract(raw_json, '$.success') = 'false'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -383,7 +383,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT\n  json_extract(raw_json, '$.tool_name') AS tool_name,\n  SUM(CASE WHEN json_extract(raw_json, '$.decision') = 'accept' THEN 1 ELSE 0 END) AS accept,\n  SUM(CASE WHEN json_extract(raw_json, '$.decision') = 'reject' THEN 1 ELSE 0 END) AS reject\nFROM session_events\nWHERE event_name = 'tool_decision'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.tool_name')\nORDER BY (accept + reject) DESC\nLIMIT 15",
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.tool_name') AS tool_name,\n  SUM(CASE WHEN json_extract(raw_json, '$.decision') = 'accept' THEN 1 ELSE 0 END) AS accept,\n  SUM(CASE WHEN json_extract(raw_json, '$.decision') = 'reject' THEN 1 ELSE 0 END) AS reject\nFROM session_events\nWHERE event_name = 'tool_decision'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.tool_name')\nORDER BY (accept + reject) DESC\nLIMIT 15",
           "format": "table"
         }
       ]
@@ -416,7 +416,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT\n  json_extract(raw_json, '$.tool_name') AS tool_name,\n  ROUND(AVG(CAST(json_extract(raw_json, '$.duration_ms') AS REAL)), 0) AS avg_ms\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND json_extract(raw_json, '$.duration_ms') IS NOT NULL\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.tool_name')\nORDER BY avg_ms DESC\nLIMIT 15",
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.tool_name') AS tool_name,\n  ROUND(AVG(CAST(json_extract(raw_json, '$.duration_ms') AS REAL)), 0) AS avg_ms\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND json_extract(raw_json, '$.duration_ms') IS NOT NULL\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.tool_name')\nORDER BY avg_ms DESC\nLIMIT 15",
           "format": "table"
         }
       ]
@@ -459,7 +459,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'user_prompt'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'user_prompt'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -502,7 +502,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT\n  ROUND(AVG(CAST(json_extract(raw_json, '$.prompt_length') AS INTEGER)), 0) AS value\nFROM session_events\nWHERE event_name = 'user_prompt'\n  AND json_extract(raw_json, '$.prompt_length') IS NOT NULL\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT\n  ROUND(AVG(CAST(json_extract(raw_json, '$.prompt_length') AS INTEGER)), 0) AS value\nFROM session_events\nWHERE event_name = 'user_prompt'\n  AND json_extract(raw_json, '$.prompt_length') IS NOT NULL\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -539,7 +539,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT\n  DATE(event_timestamp) || 'T00:00:00Z' AS time,\n  COUNT(*) AS prompt_count\nFROM session_events\nWHERE event_name = 'user_prompt'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY DATE(event_timestamp)\nORDER BY time ASC",
+          "rawQueryText": "SELECT strftime('%Y-%m-%dT00:00:00Z', event_timestamp) AS time, COUNT(*) AS prompt_count FROM session_events WHERE event_name = 'user_prompt' GROUP BY DATE(event_timestamp) ORDER BY time ASC",
           "format": "time_series",
           "timeColumns": [
             "time"
@@ -593,7 +593,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'api_error'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'api_error'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -644,7 +644,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'internal_error'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'internal_error'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -695,7 +695,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'auth'\n  AND json_extract(raw_json, '$.success') = 'false'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'auth'\n  AND json_extract(raw_json, '$.success') = 'false'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -725,7 +725,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT\n  event_timestamp AS timestamp,\n  json_extract(raw_json, '$.model') AS model,\n  json_extract(raw_json, '$.status_code') AS status_code,\n  CAST(json_extract(raw_json, '$.attempt') AS INTEGER) AS attempt,\n  CAST(json_extract(raw_json, '$.duration_ms') AS INTEGER) AS duration_ms,\n  SUBSTR(json_extract(raw_json, '$.error'), 1, 120) AS error_message\nFROM session_events\nWHERE event_name = 'api_error'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nORDER BY event_timestamp DESC\nLIMIT 50",
+          "rawQueryText": "SELECT\n  event_timestamp AS timestamp,\n  json_extract(raw_json, '$.model') AS model,\n  json_extract(raw_json, '$.status_code') AS status_code,\n  CAST(json_extract(raw_json, '$.attempt') AS INTEGER) AS attempt,\n  CAST(json_extract(raw_json, '$.duration_ms') AS INTEGER) AS duration_ms,\n  SUBSTR(json_extract(raw_json, '$.error'), 1, 120) AS error_message\nFROM session_events\nWHERE event_name = 'api_error'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nORDER BY event_timestamp DESC\nLIMIT 50",
           "format": "table"
         }
       ]
@@ -768,7 +768,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'mcp_server_connection'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'mcp_server_connection'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -811,7 +811,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'skill_activated'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'skill_activated'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -862,7 +862,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT\n  ROUND(\n    100.0 * SUM(CAST(json_extract(raw_json, '$.num_success') AS INTEGER))\n    / NULLIF(SUM(CAST(json_extract(raw_json, '$.num_hooks') AS INTEGER)), 0),\n    1\n  ) AS value\nFROM session_events\nWHERE event_name = 'hook_execution_complete'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "rawQueryText": "SELECT\n  ROUND(\n    100.0 * SUM(CAST(json_extract(raw_json, '$.num_success') AS INTEGER))\n    / NULLIF(SUM(CAST(json_extract(raw_json, '$.num_hooks') AS INTEGER)), 0),\n    1\n  ) AS value\nFROM session_events\nWHERE event_name = 'hook_execution_complete'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
           "format": "table"
         }
       ]
@@ -926,7 +926,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT\n  json_extract(raw_json, '$.hook_event') AS hook_event,\n  SUM(CAST(json_extract(raw_json, '$.num_success') AS INTEGER)) AS success,\n  SUM(\n    CAST(json_extract(raw_json, '$.num_hooks') AS INTEGER)\n    - CAST(json_extract(raw_json, '$.num_success') AS INTEGER)\n  ) AS failure\nFROM session_events\nWHERE event_name = 'hook_execution_complete'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.hook_event')\nORDER BY (success + failure) DESC",
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.hook_event') AS hook_event,\n  SUM(CAST(json_extract(raw_json, '$.num_success') AS INTEGER)) AS success,\n  SUM(\n    CAST(json_extract(raw_json, '$.num_hooks') AS INTEGER)\n    - CAST(json_extract(raw_json, '$.num_success') AS INTEGER)\n  ) AS failure\nFROM session_events\nWHERE event_name = 'hook_execution_complete'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.hook_event')\nORDER BY (success + failure) DESC",
           "format": "table"
         }
       ]
@@ -959,7 +959,7 @@
       },
       "targets": [
         {
-          "rawSql": "SELECT\n  json_extract(raw_json, '$.skill.name') AS skill_name,\n  COUNT(*) AS activations\nFROM session_events\nWHERE event_name = 'skill_activated'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.skill.name')\nORDER BY activations DESC",
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.skill.name') AS skill_name,\n  COUNT(*) AS activations\nFROM session_events\nWHERE event_name = 'skill_activated'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.skill.name')\nORDER BY activations DESC",
           "format": "table"
         }
       ]
