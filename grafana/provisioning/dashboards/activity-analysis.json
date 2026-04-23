@@ -239,6 +239,152 @@
           "format": "table"
         }
       ]
+    },
+    {
+      "id": 16,
+      "type": "stat",
+      "title": "MCP 接続数",
+      "gridPos": { "x": 0, "y": 38, "w": 6, "h": 4 },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'mcp_server_connection'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 17,
+      "type": "stat",
+      "title": "スキル起動数",
+      "gridPos": { "x": 6, "y": 38, "w": 6, "h": 4 },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'skill_activated'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 18,
+      "type": "stat",
+      "title": "フック成功率",
+      "gridPos": { "x": 12, "y": 38, "w": 6, "h": 4 },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percent",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "red", "value": null },
+              { "color": "yellow", "value": 70 },
+              { "color": "green", "value": 90 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT\n  ROUND(\n    100.0 * SUM(CAST(json_extract(raw_json, '$.num_success') AS INTEGER))\n    / NULLIF(SUM(CAST(json_extract(raw_json, '$.num_hooks') AS INTEGER)), 0),\n    1\n  ) AS value\nFROM session_events\nWHERE event_name = 'hook_execution_complete'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 19,
+      "type": "barchart",
+      "title": "フックイベント別 成功/失敗件数",
+      "gridPos": { "x": 0, "y": 42, "w": 12, "h": 9 },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "hook_event",
+        "stacking": "normal",
+        "orientation": "auto",
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": [
+          {
+            "matcher": { "id": "byName", "options": "success" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "#73BF69", "mode": "fixed" } }]
+          },
+          {
+            "matcher": { "id": "byName", "options": "failure" },
+            "properties": [{ "id": "color", "value": { "fixedColor": "#F2495C", "mode": "fixed" } }]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT\n  json_extract(raw_json, '$.hook_event') AS hook_event,\n  SUM(CAST(json_extract(raw_json, '$.num_success') AS INTEGER)) AS success,\n  SUM(\n    CAST(json_extract(raw_json, '$.num_hooks') AS INTEGER)\n    - CAST(json_extract(raw_json, '$.num_success') AS INTEGER)\n  ) AS failure\nFROM session_events\nWHERE event_name = 'hook_execution_complete'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.hook_event')\nORDER BY (success + failure) DESC",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 20,
+      "type": "barchart",
+      "title": "スキル別起動件数",
+      "gridPos": { "x": 12, "y": 42, "w": 12, "h": 9 },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "skill_name",
+        "stacking": "none",
+        "orientation": "auto",
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT\n  json_extract(raw_json, '$.skill.name') AS skill_name,\n  COUNT(*) AS activations\nFROM session_events\nWHERE event_name = 'skill_activated'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.skill.name')\nORDER BY activations DESC",
+          "format": "table"
+        }
+      ]
     }
   ]
 }
