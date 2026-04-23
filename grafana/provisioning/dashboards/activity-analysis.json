@@ -119,6 +119,126 @@
           "timeColumns": ["time"]
         }
       ]
+    },
+    {
+      "id": 12,
+      "type": "stat",
+      "title": "API エラー数",
+      "gridPos": { "x": 0, "y": 25, "w": 6, "h": 4 },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 10 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'api_error'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 13,
+      "type": "stat",
+      "title": "内部エラー数",
+      "gridPos": { "x": 6, "y": 25, "w": 6, "h": 4 },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 10 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'internal_error'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 14,
+      "type": "stat",
+      "title": "認証エラー数",
+      "gridPos": { "x": 12, "y": 25, "w": 6, "h": 4 },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "background",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              { "color": "green", "value": null },
+              { "color": "yellow", "value": 1 },
+              { "color": "red", "value": 5 }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'auth'\n  AND json_extract(raw_json, '$.success') = 'false'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 15,
+      "type": "table",
+      "title": "API エラー詳細一覧",
+      "gridPos": { "x": 0, "y": 29, "w": 24, "h": 9 },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "showHeader": true,
+        "footer": { "show": false }
+      },
+      "fieldConfig": {
+        "defaults": { "unit": "short" },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT\n  event_timestamp AS timestamp,\n  json_extract(raw_json, '$.model') AS model,\n  json_extract(raw_json, '$.status_code') AS status_code,\n  CAST(json_extract(raw_json, '$.attempt') AS INTEGER) AS attempt,\n  CAST(json_extract(raw_json, '$.duration_ms') AS INTEGER) AS duration_ms,\n  SUBSTR(json_extract(raw_json, '$.error'), 1, 120) AS error_message\nFROM session_events\nWHERE event_name = 'api_error'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nORDER BY event_timestamp DESC\nLIMIT 50",
+          "format": "table"
+        }
+      ]
     }
   ]
 }
