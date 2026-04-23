@@ -1,0 +1,37 @@
+{
+  "title": "Claude Code アクティビティ分析",
+  "uid": "claude-code-activity",
+  "schemaVersion": 38,
+  "version": 1,
+  "tags": [
+    "claude-code",
+    "activity",
+    "tools"
+  ],
+  "description": "ツール使用品質・プロンプト・エラー・MCP/スキル/フック統計",
+  "editable": true,
+  "style": "dark",
+  "refresh": "1m",
+  "timezone": "utc",
+  "time": {
+    "from": "now-7d",
+    "to": "now"
+  },
+  "timepicker": {
+    "refresh_intervals": [
+      "30s",
+      "1m",
+      "5m",
+      "15m",
+      "1h"
+    ],
+    "time_options": [
+      "1h",
+      "6h",
+      "24h",
+      "7d",
+      "30d"
+    ]
+  },
+  "panels": []
+}
