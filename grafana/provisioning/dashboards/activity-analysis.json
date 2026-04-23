@@ -33,5 +33,92 @@
       "30d"
     ]
   },
-  "panels": []
+  "panels": [
+    {
+      "id": 9,
+      "type": "stat",
+      "title": "総プロンプト数",
+      "gridPos": { "x": 0, "y": 13, "w": 6, "h": 4 },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "locale",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT COUNT(*) AS value\nFROM session_events\nWHERE event_name = 'user_prompt'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "type": "stat",
+      "title": "平均プロンプト長",
+      "gridPos": { "x": 6, "y": 13, "w": 6, "h": 4 },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": { "calcs": ["lastNotNull"] },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "locale",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [{ "color": "green", "value": null }]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT\n  ROUND(AVG(CAST(json_extract(raw_json, '$.prompt_length') AS INTEGER)), 0) AS value\nFROM session_events\nWHERE event_name = 'user_prompt'\n  AND json_extract(raw_json, '$.prompt_length') IS NOT NULL\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 11,
+      "type": "timeseries",
+      "title": "日次プロンプト数推移",
+      "gridPos": { "x": 0, "y": 17, "w": 24, "h": 8 },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "tooltip": { "mode": "single" },
+        "legend": { "displayMode": "list", "placement": "bottom" }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawSql": "SELECT\n  DATE(event_timestamp) || 'T00:00:00Z' AS time,\n  COUNT(*) AS prompt_count\nFROM session_events\nWHERE event_name = 'user_prompt'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY DATE(event_timestamp)\nORDER BY time ASC",
+          "format": "time_series",
+          "timeColumns": ["time"]
+        }
+      ]
+    }
+  ]
 }
