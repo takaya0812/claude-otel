@@ -1,0 +1,50 @@
+name: Claude Code Settings Report
+
+on:
+  push:
+    paths:
+      - data/tool_stats_export.json
+  workflow_dispatch:
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    permissions:
+      issues: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Generate report
+        id: report
+        run: |
+          python3 scripts/recommend_settings.py \
+            --from-json data/tool_stats_export.json \
+            --output report.md
+          echo "body<<EOF" >> "$GITHUB_OUTPUT"
+          cat report.md >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Upsert GitHub Issue
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TITLE="Claude Code 設定おすすめレポート"
+          ISSUE_NUMBER=$(gh issue list \
+            --label "settings-report" \
+            --state open \
+            --json number \
+            --jq '.[0].number' 2>/dev/null || echo "")
+
+          if [ -n "$ISSUE_NUMBER" ]; then
+            gh issue edit "$ISSUE_NUMBER" \
+              --title "$TITLE" \
+              --body-file report.md
+            echo "Updated issue #$ISSUE_NUMBER"
+          else
+            gh issue create \
+              --title "$TITLE" \
+              --body-file report.md \
+              --label "settings-report"
+            echo "Created new issue"
+          fi

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN"
+  "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+  <key>Label</key>
+  <string>com.claude-otel.weekly-report</string>
+
+  <key>ProgramArguments</key>
+  <array>
+    <string>/bin/zsh</string>
+    <string>-c</string>
+    <string>
+      cd /Users/takaya/dev/claude-otel &amp;&amp;
+      python3 scripts/ingest.py &amp;&amp;
+      python3 scripts/export_stats.py --days 30 &amp;&amp;
+      git add data/tool_stats_export.json &amp;&amp;
+      git diff --cached --quiet || git commit -m "chore: update tool stats export" &amp;&amp;
+      git push
+    </string>
+  </array>
+
+  <!-- Every Monday at 09:00 -->
+  <key>StartCalendarInterval</key>
+  <dict>
+    <key>Weekday</key>
+    <integer>1</integer>
+    <key>Hour</key>
+    <integer>9</integer>
+    <key>Minute</key>
+    <integer>0</integer>
+  </dict>
+
+  <key>StandardOutPath</key>
+  <string>/tmp/claude-otel-weekly-report.log</string>
+  <key>StandardErrorPath</key>
+  <string>/tmp/claude-otel-weekly-report.err</string>
+
+  <key>RunAtLoad</key>
+  <false/>
+</dict>
+</plist>

@@ -64,12 +64,25 @@ def init_db(conn: sqlite3.Connection):
         raw_json    TEXT
     );
 
+    CREATE TABLE IF NOT EXISTS metrics (
+        id               INTEGER PRIMARY KEY AUTOINCREMENT,
+        ingested_at      TEXT    NOT NULL,
+        metric_name      TEXT,
+        metric_timestamp TEXT,
+        session_id       TEXT,
+        user_email       TEXT,
+        value            REAL,
+        attributes       TEXT
+    );
+
     CREATE INDEX IF NOT EXISTS idx_api_session   ON api_requests(session_id);
     CREATE INDEX IF NOT EXISTS idx_api_ts        ON api_requests(event_timestamp);
     CREATE INDEX IF NOT EXISTS idx_api_email     ON api_requests(user_email);
     CREATE INDEX IF NOT EXISTS idx_api_model     ON api_requests(model);
     CREATE INDEX IF NOT EXISTS idx_sess_session  ON session_events(session_id);
     CREATE INDEX IF NOT EXISTS idx_sess_name     ON session_events(event_name);
+    CREATE INDEX IF NOT EXISTS idx_metrics_name  ON metrics(metric_name);
+    CREATE INDEX IF NOT EXISTS idx_metrics_ts    ON metrics(metric_timestamp);
 
     -- 便利なビュー: 日次コスト集計
     CREATE VIEW IF NOT EXISTS daily_cost AS
@@ -150,6 +163,74 @@ def extract_int(d: dict, *keys):
             except (TypeError, ValueError):
                 pass
     return None
+
+
+def process_metric_record(resource_metrics: dict, conn: sqlite3.Connection):
+    """OTel resourceMetrics を metrics テーブルへ挿入"""
+    resource_attrs = parse_attributes(
+        resource_metrics.get("resource", {}).get("attributes", [])
+    )
+    now = datetime.now(timezone.utc).isoformat()
+
+    _skip_keys = frozenset({
+        "service.name", "service.version", "session.id", "user.email",
+        "user.id", "user.account_uuid", "organization.id",
+        "os.type", "os.version", "host.arch", "terminal.type",
+    })
+
+    for scope_metrics in resource_metrics.get("scopeMetrics", []):
+        for metric in scope_metrics.get("metrics", []):
+            metric_name = metric.get("name", "")
+            if not metric_name.startswith("claude_code."):
+                continue
+            data_points = metric.get("sum", {}).get("dataPoints", [])
+            for dp in data_points:
+                dp_attrs = parse_attributes(dp.get("attributes", []))
+                merged = {**resource_attrs, **dp_attrs}
+
+                raw_value = dp.get("asDouble")
+                if raw_value is None:
+                    raw_value = dp.get("asInt")
+                if raw_value is None:
+                    continue
+
+                ts_nano = dp.get("timeUnixNano", "0")
+                try:
+                    ts = datetime.fromtimestamp(
+                        int(ts_nano) / 1e9, tz=timezone.utc
+                    ).strftime("%Y-%m-%dT%H:%M:%SZ")
+                except (ValueError, OverflowError):
+                    ts = None
+
+                extra = {k: v for k, v in merged.items() if k not in _skip_keys}
+
+                conn.execute("""
+                INSERT INTO metrics
+                    (ingested_at, metric_name, metric_timestamp,
+                     session_id, user_email, value, attributes)
+                VALUES (?,?,?,?,?,?,?)
+                """, (
+                    now,
+                    metric_name,
+                    ts,
+                    extract_string(merged, "session.id"),
+                    extract_string(merged, "user.email"),
+                    float(raw_value),
+                    json.dumps(extra, ensure_ascii=False),
+                ))
+
+
+def migrate_metrics_from_raw_records(conn: sqlite3.Connection):
+    """raw_records 内の既存メトリクスデータを metrics テーブルへ移行"""
+    rows = conn.execute(
+        "SELECT raw_json FROM raw_records WHERE record_type = 'metric'"
+    ).fetchall()
+    for (raw_json,) in rows:
+        try:
+            process_metric_record(json.loads(raw_json), conn)
+        except Exception:
+            pass
+    conn.commit()
 
 
 def process_log_record(record: dict, resource_attrs: dict, conn: sqlite3.Connection):
@@ -240,12 +321,13 @@ def ingest_line(line: str, conn: sqlite3.Connection) -> int:
                 process_log_record(record, resource_attrs, conn)
                 count += 1
 
-    # metrics / traces は raw_records に保存
+    # metrics: raw_records に保存しつつ metrics テーブルへも展開
     for resource_metrics in data.get("resourceMetrics", []):
         conn.execute(
             "INSERT INTO raw_records (ingested_at, record_type, raw_json) VALUES (?,?,?)",
             (now, "metric", json.dumps(resource_metrics, ensure_ascii=False))
         )
+        process_metric_record(resource_metrics, conn)
         count += 1
 
     for resource_spans in data.get("resourceSpans", []):
@@ -270,6 +352,10 @@ def ingest_file(jsonl_path: Path, db_path: Path, offset_path: Path):
 
     conn = sqlite3.connect(db_path)
     init_db(conn)
+
+    metrics_count = conn.execute("SELECT COUNT(*) FROM metrics").fetchone()[0]
+    if metrics_count == 0:
+        migrate_metrics_from_raw_records(conn)
 
     total = 0
     with open(jsonl_path, "r", encoding="utf-8") as f:

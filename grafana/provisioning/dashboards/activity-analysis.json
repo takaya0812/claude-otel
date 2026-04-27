@@ -963,6 +963,812 @@
           "format": "table"
         }
       ]
+    },
+    {
+      "id": 21,
+      "type": "barchart",
+      "title": "ツール別平均ペイロードサイズ",
+      "gridPos": {
+        "x": 0,
+        "y": 51,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "tool_name",
+        "stacking": "none",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "bytes"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.tool_name') AS tool_name,\n  ROUND(AVG(CAST(json_extract(raw_json, '$.tool_result_size_bytes') AS REAL)), 0) AS avg_bytes\nFROM session_events\nWHERE event_name = 'tool_result'\n  AND json_extract(raw_json, '$.tool_result_size_bytes') IS NOT NULL\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.tool_name')\nORDER BY avg_bytes DESC\nLIMIT 15",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 22,
+      "type": "barchart",
+      "title": "許可経路別 accept 件数",
+      "gridPos": {
+        "x": 12,
+        "y": 51,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "source",
+        "stacking": "normal",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "accept"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "reject"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#F2495C",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.source') AS source,\n  SUM(CASE WHEN json_extract(raw_json, '$.decision') = 'accept' THEN 1 ELSE 0 END) AS accept,\n  SUM(CASE WHEN json_extract(raw_json, '$.decision') = 'reject' THEN 1 ELSE 0 END) AS reject\nFROM session_events\nWHERE event_name = 'tool_decision'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.source')\nORDER BY (accept + reject) DESC",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 23,
+      "type": "barchart",
+      "title": "モデル別 API エラー数",
+      "gridPos": {
+        "x": 0,
+        "y": 59,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "model",
+        "stacking": "none",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.model') AS model,\n  COUNT(*) AS errors\nFROM session_events\nWHERE event_name = 'api_error'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.model')\nORDER BY errors DESC",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 24,
+      "type": "stat",
+      "title": "API エラー時平均レイテンシ",
+      "gridPos": {
+        "x": 12,
+        "y": 59,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 1000
+              },
+              {
+                "color": "red",
+                "value": 5000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  ROUND(AVG(CAST(json_extract(raw_json, '$.duration_ms') AS REAL)), 0) AS value\nFROM session_events\nWHERE event_name = 'api_error'\n  AND json_extract(raw_json, '$.duration_ms') IS NOT NULL\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 25,
+      "type": "barchart",
+      "title": "認証方式別件数",
+      "gridPos": {
+        "x": 12,
+        "y": 63,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "auth_method",
+        "stacking": "normal",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "success"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "failure"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#F2495C",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.auth_method') AS auth_method,\n  SUM(CASE WHEN json_extract(raw_json, '$.success') = 'true' THEN 1 ELSE 0 END) AS success,\n  SUM(CASE WHEN json_extract(raw_json, '$.success') = 'false' THEN 1 ELSE 0 END) AS failure\nFROM session_events\nWHERE event_name = 'auth'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.auth_method')\nORDER BY (success + failure) DESC",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 26,
+      "type": "stat",
+      "title": "MCP 平均接続レイテンシ",
+      "gridPos": {
+        "x": 0,
+        "y": 71,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 500
+              },
+              {
+                "color": "red",
+                "value": 2000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  ROUND(AVG(CAST(json_extract(raw_json, '$.duration_ms') AS REAL)), 0) AS value\nFROM session_events\nWHERE event_name = 'mcp_server_connection'\n  AND json_extract(raw_json, '$.duration_ms') IS NOT NULL\n  AND CAST(json_extract(raw_json, '$.duration_ms') AS REAL) < 60000\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 27,
+      "type": "piechart",
+      "title": "MCP トランスポート種別",
+      "gridPos": {
+        "x": 6,
+        "y": 71,
+        "w": 18,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "pieType": "pie",
+        "legend": {
+          "displayMode": "list",
+          "placement": "right"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.transport_type') AS transport_type,\n  COUNT(*) AS connections\nFROM session_events\nWHERE event_name = 'mcp_server_connection'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.transport_type')\nORDER BY connections DESC",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 28,
+      "type": "barchart",
+      "title": "Hook 名別実行数",
+      "gridPos": {
+        "x": 0,
+        "y": 79,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "hook_name",
+        "stacking": "none",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.hook_name') AS hook_name,\n  COUNT(*) AS executions\nFROM session_events\nWHERE event_name = 'hook_execution_complete'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(raw_json, '$.hook_name')\nORDER BY executions DESC",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 29,
+      "type": "stat",
+      "title": "Hook 平均実行時間",
+      "gridPos": {
+        "x": 12,
+        "y": 79,
+        "w": 6,
+        "h": 4
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        },
+        "colorMode": "value",
+        "graphMode": "none",
+        "textMode": "auto"
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "ms",
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 5000
+              },
+              {
+                "color": "red",
+                "value": 30000
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  ROUND(AVG(CAST(json_extract(raw_json, '$.total_duration_ms') AS REAL)), 0) AS value\nFROM session_events\nWHERE event_name = 'hook_execution_complete'\n  AND json_extract(raw_json, '$.total_duration_ms') IS NOT NULL\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 30,
+      "type": "barchart",
+      "title": "バージョン別 API リクエスト数",
+      "gridPos": {
+        "x": 0,
+        "y": 87,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "service_version",
+        "stacking": "none",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  service_version,\n  COUNT(*) AS requests\nFROM api_requests\nWHERE event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY service_version\nORDER BY requests DESC\nLIMIT 10",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 31,
+      "type": "barchart",
+      "title": "OS / アーキテクチャ別リクエスト数",
+      "gridPos": {
+        "x": 8,
+        "y": 87,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "os_arch",
+        "stacking": "none",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  (os_type || ' / ' || host_arch) AS os_arch,\n  COUNT(*) AS requests\nFROM api_requests\nWHERE event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY os_type, host_arch\nORDER BY requests DESC",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 32,
+      "type": "barchart",
+      "title": "ターミナル種別別セッション数",
+      "gridPos": {
+        "x": 16,
+        "y": 87,
+        "w": 8,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "terminal_type",
+        "stacking": "none",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.\"terminal.type\"') AS terminal_type,\n  COUNT(DISTINCT session_id) AS sessions\nFROM session_events\nWHERE event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\n  AND json_extract(raw_json, '$.\"terminal.type\"') IS NOT NULL\nGROUP BY json_extract(raw_json, '$.\"terminal.type\"')\nORDER BY sessions DESC",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 33,
+      "type": "timeseries",
+      "title": "日別アクティブ時間（分）",
+      "gridPos": {
+        "x": 0,
+        "y": 95,
+        "w": 24,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "tooltip": {
+          "mode": "multi"
+        },
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "m",
+          "custom": {
+            "lineWidth": 2,
+            "fillOpacity": 10
+          }
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  strftime('%Y-%m-%dT00:00:00Z', metric_timestamp) AS time,\n  ROUND(SUM(CASE WHEN json_extract(attributes, '$.type') = 'user' THEN value ELSE 0 END) / 60.0, 1) AS user_active,\n  ROUND(SUM(CASE WHEN json_extract(attributes, '$.type') = 'cli' THEN value ELSE 0 END) / 60.0, 1) AS cli_active\nFROM metrics\nWHERE metric_name = 'claude_code.active_time.total'\n  AND metric_timestamp IS NOT NULL\nGROUP BY DATE(metric_timestamp)\nORDER BY time ASC",
+          "format": "time_series",
+          "timeColumns": [
+            "time"
+          ]
+        }
+      ]
+    },
+    {
+      "id": 34,
+      "type": "barchart",
+      "title": "追加 / 削除行数（日別）",
+      "gridPos": {
+        "x": 0,
+        "y": 103,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "date",
+        "stacking": "none",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "added"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "removed"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#F2495C",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  DATE(metric_timestamp) AS date,\n  SUM(CASE WHEN json_extract(attributes, '$.type') = 'added' THEN value ELSE 0 END) AS added,\n  SUM(CASE WHEN json_extract(attributes, '$.type') = 'removed' THEN value ELSE 0 END) AS removed\nFROM metrics\nWHERE metric_name = 'claude_code.lines_of_code.count'\n  AND metric_timestamp IS NOT NULL\nGROUP BY DATE(metric_timestamp)\nORDER BY date ASC",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 35,
+      "type": "barchart",
+      "title": "言語別コード編集 accept 率",
+      "gridPos": {
+        "x": 12,
+        "y": 103,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "language",
+        "stacking": "normal",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "accept"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "reject"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#F2495C",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  json_extract(attributes, '$.language') AS language,\n  SUM(CASE WHEN json_extract(attributes, '$.decision') = 'accept' THEN value ELSE 0 END) AS accept,\n  SUM(CASE WHEN json_extract(attributes, '$.decision') = 'reject' THEN value ELSE 0 END) AS reject\nFROM metrics\nWHERE metric_name = 'claude_code.code_edit_tool.decision'\n  AND json_extract(attributes, '$.language') IS NOT NULL\n  AND metric_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\nGROUP BY json_extract(attributes, '$.language')\nORDER BY (accept + reject) DESC\nLIMIT 15",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 36,
+      "type": "barchart",
+      "title": "リトライ回数別 API エラー数",
+      "gridPos": {
+        "x": 0,
+        "y": 111,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "attempt",
+        "stacking": "none",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.attempt') AS attempt,\n  COUNT(*) AS errors\nFROM session_events\nWHERE event_name = 'api_error'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\n  AND json_extract(raw_json, '$.attempt') IS NOT NULL\nGROUP BY json_extract(raw_json, '$.attempt')\nORDER BY CAST(attempt AS INTEGER)",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 37,
+      "type": "barchart",
+      "title": "認証アクション別集計",
+      "gridPos": {
+        "x": 12,
+        "y": 111,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "xField": "action",
+        "stacking": "normal",
+        "orientation": "auto",
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "success"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#73BF69",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "failure"
+            },
+            "properties": [
+              {
+                "id": "color",
+                "value": {
+                  "fixedColor": "#F2495C",
+                  "mode": "fixed"
+                }
+              }
+            ]
+          }
+        ]
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.action') AS action,\n  SUM(CASE WHEN json_extract(raw_json, '$.success') = 'true' THEN 1 ELSE 0 END) AS success,\n  SUM(CASE WHEN json_extract(raw_json, '$.success') = 'false' THEN 1 ELSE 0 END) AS failure\nFROM session_events\nWHERE event_name = 'auth'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\n  AND json_extract(raw_json, '$.action') IS NOT NULL\nGROUP BY json_extract(raw_json, '$.action')\nORDER BY (success + failure) DESC",
+          "format": "table"
+        }
+      ]
+    },
+    {
+      "id": 38,
+      "type": "piechart",
+      "title": "Skill ソース別内訳",
+      "gridPos": {
+        "x": 0,
+        "y": 119,
+        "w": 12,
+        "h": 8
+      },
+      "datasource": "Claude Code Telemetry",
+      "options": {
+        "pieType": "pie",
+        "legend": {
+          "displayMode": "list",
+          "placement": "right"
+        }
+      },
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        },
+        "overrides": []
+      },
+      "targets": [
+        {
+          "rawQueryText": "SELECT\n  json_extract(raw_json, '$.skill.source') AS source,\n  COUNT(*) AS activations\nFROM session_events\nWHERE event_name = 'skill_activated'\n  AND event_timestamp >= strftime('%Y-%m-%dT%H:%M:%SZ', 'now', '-7 days')\n  AND json_extract(raw_json, '$.skill.source') IS NOT NULL\nGROUP BY json_extract(raw_json, '$.skill.source')\nORDER BY activations DESC",
+          "format": "table"
+        }
+      ]
     }
   ]
 }

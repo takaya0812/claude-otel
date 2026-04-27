@@ -1,0 +1,551 @@
+{
+  "exported_at": "2026-04-27T13:48:10Z",
+  "days": 30,
+  "allowed_tools": [
+    "Bash",
+    "mcp__serena__get_current_config",
+    "mcp__serena__list_dir",
+    "mcp__serena__list_memories",
+    "mcp__serena__activate_project",
+    "Read",
+    "mcp__serena__read_file",
+    "mcp__context7__resolve-library-id",
+    "mcp__serena__find_symbol",
+    "mcp__serena__read_memory",
+    "mcp__context7__query-docs",
+    "mcp__serena__check_onboarding_performed",
+    "mcp__serena__initial_instructions",
+    "mcp__serena__search_for_pattern",
+    "mcp__serena__get_symbols_overview",
+    "mcp__serena__find_referencing_symbols",
+    "mcp__serena__find_file"
+  ],
+  "tool_stats": [
+    {
+      "tool": "Bash",
+      "total": 402,
+      "accepts": 399,
+      "rejects": 3,
+      "first_seen": "2026-04-08T15:39:23.847Z",
+      "last_seen": "2026-04-27T13:41:20.908Z"
+    },
+    {
+      "tool": "mcp_tool",
+      "total": 151,
+      "accepts": 150,
+      "rejects": 1,
+      "first_seen": "2026-04-20T15:56:49.527Z",
+      "last_seen": "2026-04-23T14:09:20.845Z"
+    },
+    {
+      "tool": "Read",
+      "total": 148,
+      "accepts": 148,
+      "rejects": 0,
+      "first_seen": "2026-04-08T15:39:25.276Z",
+      "last_seen": "2026-04-27T13:40:50.871Z"
+    },
+    {
+      "tool": "Edit",
+      "total": 96,
+      "accepts": 96,
+      "rejects": 0,
+      "first_seen": "2026-04-20T14:41:09.493Z",
+      "last_seen": "2026-04-27T13:41:16.177Z"
+    },
+    {
+      "tool": "Write",
+      "total": 57,
+      "accepts": 57,
+      "rejects": 0,
+      "first_seen": "2026-04-20T14:39:58.789Z",
+      "last_seen": "2026-04-27T13:41:01.680Z"
+    },
+    {
+      "tool": "ToolSearch",
+      "total": 52,
+      "accepts": 52,
+      "rejects": 0,
+      "first_seen": "2026-04-20T15:50:26.761Z",
+      "last_seen": "2026-04-26T09:57:05.704Z"
+    },
+    {
+      "tool": "Glob",
+      "total": 26,
+      "accepts": 26,
+      "rejects": 0,
+      "first_seen": "2026-04-20T15:56:39.581Z",
+      "last_seen": "2026-04-25T07:14:14.426Z"
+    },
+    {
+      "tool": "TodoWrite",
+      "total": 24,
+      "accepts": 24,
+      "rejects": 0,
+      "first_seen": "2026-04-21T13:56:43.897Z",
+      "last_seen": "2026-04-26T10:07:19.550Z"
+    },
+    {
+      "tool": "WebSearch",
+      "total": 14,
+      "accepts": 14,
+      "rejects": 0,
+      "first_seen": "2026-04-20T15:46:46.955Z",
+      "last_seen": "2026-04-23T14:11:10.066Z"
+    },
+    {
+      "tool": "Agent",
+      "total": 9,
+      "accepts": 9,
+      "rejects": 0,
+      "first_seen": "2026-04-22T13:27:50.531Z",
+      "last_seen": "2026-04-23T14:02:16.384Z"
+    },
+    {
+      "tool": "Skill",
+      "total": 8,
+      "accepts": 8,
+      "rejects": 0,
+      "first_seen": "2026-04-20T15:52:43.199Z",
+      "last_seen": "2026-04-26T14:28:56.187Z"
+    },
+    {
+      "tool": "Grep",
+      "total": 2,
+      "accepts": 2,
+      "rejects": 0,
+      "first_seen": "2026-04-23T14:21:16.558Z",
+      "last_seen": "2026-04-23T14:22:34.364Z"
+    },
+    {
+      "tool": "ExitPlanMode",
+      "total": 2,
+      "accepts": 1,
+      "rejects": 1,
+      "first_seen": "2026-04-23T07:24:40.701Z",
+      "last_seen": "2026-04-23T14:07:52.718Z"
+    }
+  ],
+  "daily_stats": [
+    {
+      "day": "2026-04-27",
+      "tool": "Write",
+      "uses": 5,
+      "accepts": 5,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-27",
+      "tool": "Read",
+      "uses": 4,
+      "accepts": 4,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-27",
+      "tool": "Edit",
+      "uses": 4,
+      "accepts": 4,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-27",
+      "tool": "Bash",
+      "uses": 4,
+      "accepts": 4,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-26",
+      "tool": "Read",
+      "uses": 27,
+      "accepts": 27,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-26",
+      "tool": "Bash",
+      "uses": 23,
+      "accepts": 22,
+      "rejects": 1
+    },
+    {
+      "day": "2026-04-26",
+      "tool": "Write",
+      "uses": 12,
+      "accepts": 12,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-26",
+      "tool": "TodoWrite",
+      "uses": 6,
+      "accepts": 6,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-26",
+      "tool": "Edit",
+      "uses": 6,
+      "accepts": 6,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-26",
+      "tool": "ToolSearch",
+      "uses": 2,
+      "accepts": 2,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-26",
+      "tool": "Skill",
+      "uses": 2,
+      "accepts": 2,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-25",
+      "tool": "Bash",
+      "uses": 31,
+      "accepts": 31,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-25",
+      "tool": "Read",
+      "uses": 9,
+      "accepts": 9,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-25",
+      "tool": "Edit",
+      "uses": 8,
+      "accepts": 8,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-25",
+      "tool": "Glob",
+      "uses": 7,
+      "accepts": 7,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-25",
+      "tool": "Write",
+      "uses": 4,
+      "accepts": 4,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-25",
+      "tool": "TodoWrite",
+      "uses": 4,
+      "accepts": 4,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-25",
+      "tool": "ToolSearch",
+      "uses": 1,
+      "accepts": 1,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "Bash",
+      "uses": 155,
+      "accepts": 155,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "mcp_tool",
+      "uses": 52,
+      "accepts": 51,
+      "rejects": 1
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "Read",
+      "uses": 52,
+      "accepts": 52,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "Edit",
+      "uses": 39,
+      "accepts": 39,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "ToolSearch",
+      "uses": 17,
+      "accepts": 17,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "Glob",
+      "uses": 16,
+      "accepts": 16,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "Write",
+      "uses": 9,
+      "accepts": 9,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "Agent",
+      "uses": 8,
+      "accepts": 8,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "TodoWrite",
+      "uses": 5,
+      "accepts": 5,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "WebSearch",
+      "uses": 4,
+      "accepts": 4,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "Grep",
+      "uses": 2,
+      "accepts": 2,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "ExitPlanMode",
+      "uses": 2,
+      "accepts": 1,
+      "rejects": 1
+    },
+    {
+      "day": "2026-04-23",
+      "tool": "Skill",
+      "uses": 1,
+      "accepts": 1,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-22",
+      "tool": "Bash",
+      "uses": 77,
+      "accepts": 75,
+      "rejects": 2
+    },
+    {
+      "day": "2026-04-22",
+      "tool": "mcp_tool",
+      "uses": 38,
+      "accepts": 38,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-22",
+      "tool": "Read",
+      "uses": 32,
+      "accepts": 32,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-22",
+      "tool": "Write",
+      "uses": 13,
+      "accepts": 13,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-22",
+      "tool": "Edit",
+      "uses": 10,
+      "accepts": 10,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-22",
+      "tool": "ToolSearch",
+      "uses": 4,
+      "accepts": 4,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-22",
+      "tool": "Glob",
+      "uses": 2,
+      "accepts": 2,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-22",
+      "tool": "Skill",
+      "uses": 1,
+      "accepts": 1,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-22",
+      "tool": "Agent",
+      "uses": 1,
+      "accepts": 1,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-21",
+      "tool": "Bash",
+      "uses": 62,
+      "accepts": 62,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-21",
+      "tool": "mcp_tool",
+      "uses": 58,
+      "accepts": 58,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-21",
+      "tool": "Edit",
+      "uses": 21,
+      "accepts": 21,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-21",
+      "tool": "ToolSearch",
+      "uses": 18,
+      "accepts": 18,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-21",
+      "tool": "Read",
+      "uses": 11,
+      "accepts": 11,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-21",
+      "tool": "TodoWrite",
+      "uses": 9,
+      "accepts": 9,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-21",
+      "tool": "Skill",
+      "uses": 3,
+      "accepts": 3,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-21",
+      "tool": "Write",
+      "uses": 2,
+      "accepts": 2,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-21",
+      "tool": "WebSearch",
+      "uses": 2,
+      "accepts": 2,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-20",
+      "tool": "Bash",
+      "uses": 40,
+      "accepts": 40,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-20",
+      "tool": "Write",
+      "uses": 12,
+      "accepts": 12,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-20",
+      "tool": "ToolSearch",
+      "uses": 10,
+      "accepts": 10,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-20",
+      "tool": "Read",
+      "uses": 10,
+      "accepts": 10,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-20",
+      "tool": "WebSearch",
+      "uses": 8,
+      "accepts": 8,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-20",
+      "tool": "Edit",
+      "uses": 8,
+      "accepts": 8,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-20",
+      "tool": "mcp_tool",
+      "uses": 3,
+      "accepts": 3,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-20",
+      "tool": "Skill",
+      "uses": 1,
+      "accepts": 1,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-20",
+      "tool": "Glob",
+      "uses": 1,
+      "accepts": 1,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-08",
+      "tool": "Bash",
+      "uses": 10,
+      "accepts": 10,
+      "rejects": 0
+    },
+    {
+      "day": "2026-04-08",
+      "tool": "Read",
+      "uses": 3,
+      "accepts": 3,
+      "rejects": 0
+    }
+  ]
+}

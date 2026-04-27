@@ -3,6 +3,8 @@ data/
 *.db
 *.jsonl
 *.offset
+# Track aggregated export (no raw events, no PII)
+!data/tool_stats_export.json
 
 # MCP browser session logs
 .playwright-mcp/

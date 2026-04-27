@@ -112,6 +112,47 @@ FROM api_requests GROUP BY model;
 SELECT * FROM session_summary ORDER BY session_start DESC LIMIT 10;
 ```
 
+## 設定おすすめレポート
+
+ツール使用履歴を分析して、`~/.claude/settings.json` への追加を提案するレポートを生成できます。
+
+```bash
+# 直近7日間で分析（デフォルト）
+python3 scripts/recommend_settings.py
+
+# 分析期間を指定
+python3 scripts/recommend_settings.py --days 30
+```
+
+accept 率 95% 以上かつ 3 回以上使ったツールを自動許可候補として提案します。
+
+### 自動化（毎週月曜09:00に実行）
+
+1. launchd に登録:
+
+```bash
+cp launchd/com.claude-otel.weekly-report.plist ~/Library/LaunchAgents/
+launchctl load ~/Library/LaunchAgents/com.claude-otel.weekly-report.plist
+```
+
+2. 初回実行（動作確認）:
+
+```bash
+python3 scripts/export_stats.py --days 30
+git add data/tool_stats_export.json
+git commit -m "chore: add tool stats export"
+git push
+```
+
+3. push をトリガーに GitHub Actions がレポートを生成し、
+   リポジトリの Issues に「Claude Code 設定おすすめレポート」として投稿されます。
+
+launchd の停止:
+
+```bash
+launchctl unload ~/Library/LaunchAgents/com.claude-otel.weekly-report.plist
+```
+
 ## Docker停止
 
 ```bash
